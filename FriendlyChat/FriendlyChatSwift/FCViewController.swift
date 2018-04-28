@@ -73,6 +73,13 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
         // COMPLETED 3: configure database to sync messages
         // FIRDatabase ganti nama dengan Database
         ref = Database.database().reference()
+        
+        // COMPLETED 5: tampilkan semua pesan dengan snapshot
+        _refHandle = ref.child("messages").observe(.childAdded, with: { (snapshot: DataSnapshot) in
+            self.messages.append(snapshot)
+            self.messagesTable.insertRows(at: [IndexPath(row: self.messages.count-1, section: 0)], with: .automatic)
+            self.scrollToBottomMessage()
+        })
     }
     
     func configureStorage() {
@@ -80,7 +87,8 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     deinit {
-        // TODO: set up what needs to be deinitialized when view is no longer being used
+        // COMPLETED 6: set up what needs to be deinitialized when view is no longer being used
+        ref.child("messages").removeObserver(withHandle: _refHandle)
     }
     
     // MARK: Remote Config
@@ -163,7 +171,7 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
     @IBAction func showLoginView(_ sender: AnyObject) {
         loginSession()
     }
-    
+
     @IBAction func didTapAddPhoto(_ sender: AnyObject) {
         let picker = UIImagePickerController()
         picker.delegate = self
@@ -212,8 +220,18 @@ extension FCViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // dequeue cell
         let cell: UITableViewCell! = messagesTable.dequeueReusableCell(withIdentifier: "messageCell", for: indexPath)
+        // COMPLETED 7: update cell to display message data
+        // yang pertama dilakukan, keluarkan data nama dan text dari snapshot
+        let messageSnapshot: DataSnapshot! = messages[indexPath.row]
+        let message = messageSnapshot.value as! [String:String]
+        
+        let name = message[Constants.MessageFields.name] ?? "[username]"
+        let text = message[Constants.MessageFields.text] ?? "[text]"
+        
+        cell!.textLabel?.text = name + ": " + text
+        cell!.imageView?.image = self.placeholderImage
+        
         return cell!
-        // TODO: update cell to display message data
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
