@@ -285,8 +285,8 @@ extension FCViewController: UITableViewDelegate, UITableViewDataSource {
                 // update cell gambar jika posisi sedang tampil dilayar
                 if cell == tableView.cellForRow(at: indexPath) {
                     DispatchQueue.main.async {
-                        cell.imageView?.image = messageImage
-                        cell.setNeedsLayout()
+                        cell!.imageView?.image = messageImage
+                        cell!.setNeedsLayout()
                     }
                 }
             }
