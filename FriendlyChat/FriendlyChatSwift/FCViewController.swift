@@ -103,7 +103,8 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     func configureStorage() {
-        // TODO: configure storage using your firebase storage
+        // COMPLETED 10: configure storage using your firebase storage
+        storageRef = Storage.storage().reference()
     }
     
     deinit {
@@ -142,6 +143,7 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
             
             // COMPLETED 2: Set up app to send and receive messages when signed in
             configureDatabase()
+            configureStorage()
         }
     }
     
@@ -165,7 +167,24 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     func sendPhotoMessage(photoData: Data) {
-        // TODO: create method that pushes message w/ photo to the firebase database
+        // COMPLETED 11: create method that pushes message w/ photo to the firebase database
+        
+        // buat path gambar
+        let imagePath = "chat_photos/" + Auth.auth().currentUser!.uid + "/\(Double(Date.timeIntervalSinceReferenceDate * 1000)).jpg"
+        
+        // set tipe content gambar
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpeg"
+        
+        // buat child dari node di storage
+        storageRef!.child(imagePath).putData(photoData, metadata: metadata) { (metadata, error) in
+            if let error = error {
+                print("Error uploading: \(error)")
+                return
+            }
+            
+            self.sendMessage(data: [Constants.MessageFields.imageUrl: self.storageRef.child((metadata?.path)!).description])
+        }
     }
     
     // MARK: Alert
@@ -247,10 +266,35 @@ extension FCViewController: UITableViewDelegate, UITableViewDataSource {
         let message = messageSnapshot.value as! [String:String]
         
         let name = message[Constants.MessageFields.name] ?? "[username]"
-        let text = message[Constants.MessageFields.text] ?? "[text]"
         
-        cell!.textLabel?.text = name + ": " + text
-        cell!.imageView?.image = self.placeholderImage
+        // COMPLETED 12: tampilkan gambar
+        if let imageUrl = message[Constants.MessageFields.imageUrl] {
+            cell!.textLabel?.text = "sent by: \(name)"
+
+            // unduh gambar dari firebase storage
+            // pakai withPath, bukan forURL
+            Storage.storage().reference(withPath: imageUrl).getData(maxSize: INT64_MAX) { (data, error) in
+                guard error == nil else {
+                    print("Error downloading: \(error!)")
+                    return
+                }
+
+                // tampilkan gambar disini
+                let messageImage = UIImage.init(data: data!, scale: 50)
+
+                // update cell gambar jika posisi sedang tampil dilayar
+                if cell == tableView.cellForRow(at: indexPath) {
+                    DispatchQueue.main.async {
+                        cell.imageView?.image = messageImage
+                        cell.setNeedsLayout()
+                    }
+                }
+            }
+        } else {
+            let text = message[Constants.MessageFields.text] ?? "[text]"
+            cell!.textLabel?.text = name + ": " + text
+            cell!.imageView?.image = self.placeholderImage
+        }
         
         return cell!
     }
