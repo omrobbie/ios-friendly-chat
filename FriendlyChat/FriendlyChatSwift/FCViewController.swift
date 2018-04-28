@@ -70,7 +70,9 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     func configureDatabase() {
-        // TODO: configure database to sync messages
+        // COMPLETED 3: configure database to sync messages
+        // FIRDatabase ganti nama dengan Database
+        ref = Database.database().reference()
     }
     
     func configureStorage() {
@@ -109,7 +111,8 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
             backgroundBlur.effect = nil
             messageTextField.delegate = self
             
-            // TODO: Set up app to send and receive messages when signed in
+            // COMPLETED 2: Set up app to send and receive messages when signed in
+            configureDatabase()
         }
     }
     
@@ -121,7 +124,15 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
     // MARK: Send Message
     
     func sendMessage(data: [String:String]) {
-        // TODO: create method that pushes message to the firebase database
+        // COMPLETED 4: create method that pushes message to the firebase database
+        // sama seperti memanggil /messages di firebase
+        
+        // agar dapat menyisipkan nama pengirim, kita buat variabelnya
+        var mdata = data
+        mdata[Constants.MessageFields.name] = displayName
+        
+        // lalu kirim ke firebase
+        ref.child("messages").childByAutoId().setValue(mdata)
     }
     
     func sendPhotoMessage(photoData: Data) {

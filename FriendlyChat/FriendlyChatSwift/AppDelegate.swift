@@ -30,7 +30,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: UIApplicationDelegate
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
-        // TODO: - configure FIRApp
+        // COMPLETED 1: - configure FIRApp
+        // FIRApp sudah ganti nama jadi FirebaseApp di Swift 4
+        FirebaseApp.configure()
         return true
     }
     
