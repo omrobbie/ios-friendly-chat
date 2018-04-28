@@ -304,7 +304,26 @@ extension FCViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-            // TODO: if message contains an image, then display the image
+        // COMPLETED 13: if message contains an image, then display the image
+        guard !messageTextField.isFirstResponder else { return }
+        
+        let messageSnapshot: DataSnapshot! = messages[(indexPath as NSIndexPath).row]
+        let message = messageSnapshot.value as! [String:String]
+        
+        if let imageUrl = message[Constants.MessageFields.imageUrl] {
+            if let cacheImage = imageCache.object(forKey: imageUrl as NSString) {
+                showImageDisplay(cacheImage)
+            } else {
+                Storage.storage().reference(withPath: imageUrl).getData(maxSize: INT64_MAX) { (data, error) in
+                    guard error == nil else {
+                        print("Error downloading: \(error!)")
+                        return
+                    }
+                    
+                    self.showImageDisplay(UIImage.init(data: data!)!)
+                }
+            }
+        }
     }
     
     // MARK: Show Image Display
