@@ -280,25 +280,25 @@ extension FCViewController: UITextFieldDelegate {
     
     // MARK: Show/Hide Keyboard
     
-    func keyboardWillShow(_ notification: Notification) {
+    @objc func keyboardWillShow(_ notification: Notification) {
         if !keyboardOnScreen {
             self.view.frame.origin.y -= self.keyboardHeight(notification)
         }
     }
     
-    func keyboardWillHide(_ notification: Notification) {
+    @objc func keyboardWillHide(_ notification: Notification) {
         if keyboardOnScreen {
             self.view.frame.origin.y += self.keyboardHeight(notification)
         }
     }
     
-    func keyboardDidShow(_ notification: Notification) {
+    @objc func keyboardDidShow(_ notification: Notification) {
         keyboardOnScreen = true
         dismissKeyboardRecognizer.isEnabled = true
         scrollToBottomMessage()
     }
     
-    func keyboardDidHide(_ notification: Notification) {
+    @objc func keyboardDidHide(_ notification: Notification) {
         dismissKeyboardRecognizer.isEnabled = false
         keyboardOnScreen = false
     }
