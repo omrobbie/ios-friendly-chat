@@ -39,3 +39,6 @@ Carthage/Build
 
 # Firebase
 *GoogleService-Info.plist
+
+# Node JS
+node_modules/
